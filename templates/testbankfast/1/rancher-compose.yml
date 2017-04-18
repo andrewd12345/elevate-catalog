@@ -42,6 +42,42 @@ catalog:
       required: true
       default: "bankfast-apac.elevate-dev.sandstone.com.au"
       type: "string"
+    - variable: rcas_db_name
+      description: "RCAS Database Name"
+      label: "RCAS Database Name"
+      required: true
+      default: "Rcas_ELEVATE"
+      type: "string"
+    - variable: rcas_db_password
+      description: "Apply Database Password"
+      label: "RCAS Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: rcas_db_user
+      description: "RCAS Database Username"
+      label: "RCAS Database User"
+      required: true
+      default: "elevate"
+      type: "string" 
+    - variable: liferay_db_name
+      description: "Liferay Database Name"
+      label: "Liferay Database Name"
+      required: fasle
+      default: "Liferay_ELEVATE"
+      type: "string"
+    - variable: liferay_db_password
+      description: "Liferay Database Password"
+      label: "Liferay Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: liferay_db_user
+      description: "Liferay Database Username"
+      label: "Liferay Database User"
+      required: true
+      default: "elevate"
+      type: "string"
 services:
   bankfast:
     scale: 1
