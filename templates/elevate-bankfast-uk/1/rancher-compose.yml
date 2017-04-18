@@ -8,7 +8,7 @@ catalog:
   questions:
     - variable: bankfast_db_name
       description: "BankFast Database Name"
-      label: "Database Name"
+      label: "BankFast Database Name"
       required: true
       default: "BankFast_ELEVATE"
       type: "string"
