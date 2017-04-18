@@ -63,7 +63,7 @@ catalog:
     - variable: liferay_db_name
       description: "Liferay Database Name"
       label: "Liferay Database Name"
-      required: fasle
+      required: false
       default: "Liferay_ELEVATE"
       type: "string"
     - variable: liferay_db_password

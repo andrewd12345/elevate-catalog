@@ -3,10 +3,10 @@ services:
   bankfast:
     image: docker-registry.sandstone.com.au/unisys/bankfast_test:1.6
     environment:
-      DB_HOST: db
-      DB_NAME: BankFast_ELEVATE_REPLACE_ME
-      DB_PASSWORD: elevate
-      DB_USERNAME: elevate
+      DB_HOST: ${db_host}
+      DB_NAME: ${bankfast_db_name}
+      DB_PASSWORD: ${bankfast_db_password}
+      DB_USERNAME: ${bankfast_db_user}
       HOST_ENDPOINT: http://localhost:12018
     stdin_open: true
     tty: true
@@ -42,11 +42,11 @@ services:
   liferay:
     image: docker-registry.sandstone.com.au/unisys/liferay:1.4
     environment:
-      DB_HOST: db
-      DB_NAME: Liferay_ELEVATE_REPLACE_ME
-      DB_PASSWORD: elevate
-      DB_USERNAME: elevate
-      SITE_ADDRESS: bankfast-apac.elevate-dev.sandstone.com.au
+      DB_HOST: ${db_host}
+      DB_NAME: ${liferay_database_name}
+      DB_PASSWORD: ${liferay_db_password}
+      DB_USERNAME: ${liferay_db_user}
+      SITE_ADDRESS: ${external_site_address}
     links:
     - db:db
     command:
@@ -56,10 +56,10 @@ services:
   rcas:
     image: docker-registry.sandstone.com.au/unisys/rcas
     environment:
-      DB_RCAS: Rcas_ELEVATE_REPLACE_ME
-      DB_RCAS_PASSWORD: elevate
-      DB_RCAS_USERNAME: elevate
-      DB_URL: jdbc:jtds:sqlserver://db:1433;databaseName=Rcas_ELEVATE_REPLACE_ME
+      DB_RCAS: ${rcas_database_name}
+      DB_RCAS_PASSWORD: ${rcas_db_password}
+      DB_RCAS_USERNAME: ${rcas_db_user}
+      DB_URL: jdbc:jtds:sqlserver://${db_host}:1433;databaseName=${rcas_database_name}
     links:
     - db:db
     - bfsi:bfsi
