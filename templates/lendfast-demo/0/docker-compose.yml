@@ -1,0 +1,158 @@
+version: '2'
+services:
+  apply2:
+    image: registry.devaws.sandstone.com.au/docker/sst_apache:babdemo_lfd_2.9_presales_bab
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+  lendfasttracker:
+    image: registry.devaws.sandstone.com.au/docker/sst_tracker:demo_lfd_2.9_build_328
+    stdin_open: true
+    volumes:
+    - /sst/demo_bab_presales/config/tracker_conf/jboss_config/standalone.conf:/sst/installed/jboss-eap-6.4/bin/standalone.conf
+    - /sst/demo_bab_presales/config/tracker_conf/jboss_config/standalone-ha.xml:/sst/installed/jboss-eap-6.4/standalone/configuration/standalone-ha.xml
+    - /sst/demo_bab_presales/logs:/sst/logs
+    - /sst/demo_bab_presales/config:/sst/external_conf
+    tty: true
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+    extra_hosts:
+    - "DefaultDatabaseServer:10.30.1.86"
+    - "DefaultQASHost:10.96.14.115"
+  lendfast:
+    image: registry.devaws.sandstone.com.au/docker/sst_lendfast:demo_lfe_3.11.2_presales_bab
+    environment:
+      DB_CDS: CDS_demo_bab_presales
+      DB_CDS_PASSWORD: lendfastseam
+      DB_CDS_USER: lendfastseam
+      DB_LENDFAST: LFE_demo_bab_presales
+      DB_LENDFAST_PASSWORD: lendfastseam
+      DB_LENDFAST_USER: lendfastseam
+      JGROUPS_BIND_ADDR: lendfast
+      JGROUPS_INITIAL_HOSTS: '"lendfast[44807],uasadmin[44807]"'
+      LIQUIBASE_SCHEMA: lfe.demo.master.changelog.xml
+      OTHER_RMI_HOSTS: '"lendfast|uasadmin"'
+      RMI_SERVER_HOSTNAME: lendfast
+    volumes:
+    - /sst/demo_bab_presales/config/lfe_conf/jboss_config/standalone.conf:/sst/installed/jboss-eap-6.4/bin/standalone.conf
+    - /sst/demo_bab_presales/config/lfe_conf/jboss_config/standalone-ha.xml:/sst/installed/jboss-eap-6.4/standalone/configuration/standalone-ha.xml
+    - /etc/localtime:/etc/localtime
+    - /sst/demo_bab_presales/logs/lendfast:/sst/logs
+    - /sst/demo_bab_presales/config:/sst/external_conf
+    extra_hosts:
+    - "DefaultDatabaseServer:10.30.1.86"
+    - "DefaultQASHost:10.96.14.115"
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+  uasadmin:
+    image: registry.devaws.sandstone.com.au/docker/sst_uasadmin:demo_lfe_3.11.3_build_latest
+    environment:
+      DB_LENDFAST: LFE_demo_bab_presales
+      DB_LENDFAST_PASSWORD: lendfastseam
+      DB_LENDFAST_USER: lendfastseam
+    volumes:
+    - /sst/demo_bab_presales/config/uasadmin_conf/jboss_config/standalone.conf:/sst/installed/jboss-eap-6.4/bin/standalone.conf
+    - /sst/demo_bab_presales/config/uasadmin_conf/jboss_config/standalone-ha.xml:/sst/installed/jboss-eap-6.4/standalone/configuration/standalone-ha.xml
+    - /etc/localtime:/etc/localtime
+    - /sst/demo_bab_presales/logs:/sst/logs
+    - /sst/demo_bab_presales/config:/sst/external_conf
+    extra_hosts:
+    - "DefaultDatabaseServer:10.30.1.86"
+    - "DefaultQASHost:10.96.14.115"
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+  cds:
+    image: registry.devaws.sandstone.com.au/docker/sst_cds:demo_lfe_3.11.3_build_latest
+    environment:
+      DB_CDS: CDS_demo_bab_presales
+      DB_CDS_PASSWORD: lendfastseam
+      DB_CDS_USER: lendfastseam
+      DB_LENDFAST: LFE_demo_bab_presales
+      DB_LENDFAST_PASSWORD: lendfastseam
+      DB_LENDFAST_USER: lendfastseam
+      JGROUPS_INITIAL_HOSTS: '"lendfast[44807],uasadmin[44807]"'
+      LIQUIBASE_SCHEMA: cds.demo.master.changelog.xml
+    volumes:
+    - /sst/demo_bab_presales/config/cds_conf/jboss_config/standalone.conf:/sst/installed/jboss-eap-6.4/bin/standalone.conf
+    - /sst/demo_bab_presales/config/cds_conf/jboss_config/standalone-ha.xml:/sst/installed/jboss-eap-6.4/standalone/configuration/standalone-ha.xml
+    - /etc/localtime:/etc/localtime
+    - /sst/demo_bab_presales/logs:/sst/logs
+    - /sst/demo_bab_presales/config:/sst/external_conf
+    extra_hosts:
+    - "DefaultDatabaseServer:10.30.1.86"
+    - "DefaultQASHost:10.96.14.115"
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+  balancer:
+    image: rancher/lb-service-haproxy:v0.4.9
+    ports:
+    - 80:80/tcp
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  apply:
+    image: registry.devaws.sandstone.com.au/docker/sst_sandstoneapply:demo_lfe_3.11.2_presales_bab
+    environment:
+      DB_APPLY: Apply_demo_bab_presales
+      DB_APPLY_PASSWORD: lendfastseam
+      DB_APPLY_USER: lendfastseam
+      DB_LENDFAST: LFE_demo_bab_presales
+      DB_LENDFAST_PASSWORD: lendfastseam
+      DB_LENDFAST_USER: lendfastseam
+      JGROUPS_BIND_ADDR: apply
+      JGROUPS_INITIAL_HOSTS: '"apply[44807]"'
+      OTHER_RMI_HOSTS: '"apply"'
+      RMI_SERVER_HOSTNAME: apply
+    volumes:
+    - /sst/demo_bab_presales/config/apply_conf/jboss_config/standalone.conf:/sst/installed/jboss-eap-6.4/bin/standalone.conf
+    - /sst/demo_bab_presales/config/apply_conf/jboss_config/standalone-ha.xml:/sst/installed/jboss-eap-6.4/standalone/configuration/standalone-ha.xml
+    - /etc/localtime:/etc/localtime
+    - /sst/demo_bab_presales/logs:/sst/logs
+    - /sst/demo_bab_presales/config:/sst/external_conf
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+    extra_hosts:
+    - "DefaultDatabaseServer:10.30.1.86"
+    - "DefaultQASHost:10.96.14.115"
+  solr:
+    image: registry.devaws.sandstone.com.au/docker/sst_solr:demo_lfe_3.11.3_build_latest
+    volumes:
+    - /sst/demo_bab_presales/logs:/sst/logs
+    - /sst/demo_bab_presales/config/solr_conf/jboss_config/standalone.conf:/sst/installed/jboss-eap-6.4/bin/standalone.conf
+    - /sst/demo_bab_presales/config/solr_conf/jboss_config/standalone-ha.xml:/sst/installed/jboss-eap-6.4/standalone/configuration/standalone-ha.xml
+    - /sst/demo_bab_presales/config:/sst/external_conf
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+  tracker:
+    image: registry.devaws.sandstone.com.au/docker/sst_apache:demo_lfd_2.8_presales_bab
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+    extra_hosts:
+    - "DefaultDatabaseServer:10.30.1.86"
+    - "DefaultQASHost:10.96.14.115"
+  lendfastfakehost:
+    image: registry.devaws.sandstone.com.au/docker/sst_lendfastfakehost:demo_lfe_3.11.2_presales_bab
+    volumes:
+    - /sst/demo_bab_presales/logs:/sst/logs
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales
+  reportingdashboard:
+    image: registry.devaws.sandstone.com.au/docker/sst_reportingdashboard:demo_lfe_3.11.2_build_latest
+    environment:
+      DB_RPT: RPT_demo_bab_presales
+      DB_RPT_PASSWORD: lendfastseam
+      DB_RPT_USER: lendfastseam
+      LIQUIBASE_SCHEMA: lfe.reporting-dashboard-service.schema.changelog.xml
+    extra_hosts:
+    - "DefaultDatabaseServer:10.30.1.86"
+    - "DefaultQASHost:10.96.14.115"
+    volumes:
+    - /sst/demo_bab_presales/config/reportingdashboard_conf/jboss_config/standalone.conf:/sst/installed/jboss-eap-6.4/bin/standalone.conf
+    - /sst/demo_bab_presales/config/reportingdashboard_conf/jboss_config/standalone-ha.xml:/sst/installed/jboss-eap-6.4/standalone/configuration/standalone-ha.xml
+    tty: true
+    labels:
+      io.rancher.scheduler.affinity:host_label: usage=presales

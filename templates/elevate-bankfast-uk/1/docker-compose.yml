@@ -1,0 +1,68 @@
+version: '2'
+services:
+  bankfast:
+    image: docker-registry.sandstone.com.au/unisys/bankfast_test:1.6
+    environment:
+      DB_HOST: db
+      DB_NAME: BankFast_ELEVATE_REPLACE_ME
+      DB_PASSWORD: elevate
+      DB_USERNAME: elevate
+      HOST_ENDPOINT: http://localhost:12018
+    stdin_open: true
+    tty: true
+    command:
+    - /bin/sh
+    - -c
+    - /sst/scripts/start.sh
+    labels:
+      io.rancher.container.start_once: 'true'
+  apache:
+    image: docker-registry.sandstone.com.au/unisys/bankfast_apache:1.1
+    stdin_open: true
+    tty: true
+  balancer:
+    image: rancher/lb-service-haproxy:v0.5.9
+    ports:
+    - 13588:13588/tcp
+    - 13500:13500/tcp
+    expose:
+    - 80:80/tcp
+    - 90:90/tcp
+    - 8080:8080/tcp
+    - 9080:9080/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  bfsi:
+    image: docker-registry.sandstone.com.au/unisys/bfsi
+    command:
+    - /bin/sh
+    - -c
+    - /opt/sst/start.sh
+  liferay:
+    image: docker-registry.sandstone.com.au/unisys/liferay:1.4
+    environment:
+      DB_HOST: db
+      DB_NAME: Liferay_ELEVATE_REPLACE_ME
+      DB_PASSWORD: elevate
+      DB_USERNAME: elevate
+      SITE_ADDRESS: bankfast-apac.elevate-dev.sandstone.com.au
+    links:
+    - db:db
+    command:
+    - /bin/sh
+    - -c
+    - /opt/sst/start.sh
+  rcas:
+    image: docker-registry.sandstone.com.au/unisys/rcas
+    environment:
+      DB_RCAS: Rcas_ELEVATE_REPLACE_ME
+      DB_RCAS_PASSWORD: elevate
+      DB_RCAS_USERNAME: elevate
+      DB_URL: jdbc:jtds:sqlserver://db:1433;databaseName=Rcas_ELEVATE_REPLACE_ME
+    links:
+    - db:db
+    - bfsi:bfsi
+    - liferay:liferay
+  db:
+    image: rancher/external-service

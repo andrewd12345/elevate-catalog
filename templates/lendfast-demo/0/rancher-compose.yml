@@ -1,0 +1,110 @@
+version: '2'
+services:
+  apply2:
+    scale: 1
+    start_on_create: true
+  lendfasttracker:
+    scale: 1
+    start_on_create: true
+  lendfast:
+    scale: 1
+    start_on_create: true
+  uasadmin:
+    scale: 1
+    start_on_create: true
+  cds:
+    scale: 1
+    start_on_create: true
+  balancer:
+    scale: 1
+    start_on_create: true
+    lb_config:
+      certs: []
+      port_rules:
+      - path: /lendfastapply
+        priority: 1
+        protocol: http
+        service: apply
+        source_port: 80
+        target_port: 8080
+      - path: /uasadmin
+        priority: 2
+        protocol: http
+        service: uasadmin
+        source_port: 80
+        target_port: 8080
+      - path: /lendfast
+        priority: 3
+        protocol: http
+        service: lendfast
+        source_port: 80
+        target_port: 8080
+      - path: /solr
+        priority: 4
+        protocol: http
+        service: solr
+        source_port: 80
+        target_port: 8080
+      - path: /apply2
+        priority: 5
+        protocol: http
+        service: apply2
+        source_port: 80
+        target_port: 8080
+      - path: /tracker
+        priority: 6
+        protocol: http
+        service: tracker
+        source_port: 80
+        target_port: 8080
+      - path: /sandstone-apply-server
+        priority: 7
+        protocol: http
+        service: apply
+        source_port: 80
+        target_port: 8080
+      - path: /lendfasttracker
+        priority: 8
+        protocol: http
+        service: lendfasttracker
+        source_port: 80
+        target_port: 8080
+      - path: /reportingdashboard
+        priority: 9
+        protocol: http
+        service: reportingdashboard
+        source_port: 80
+        target_port: 8080
+      - path: /cds
+        priority: 10
+        protocol: http
+        service: cds
+        source_port: 80
+        target_port: 8080
+      stickiness_policy:
+        cookie: lendfastcookie
+        indirect: false
+        mode: insert
+        nocache: false
+        postonly: false
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 42
+      unhealthy_threshold: 3
+      interval: 2000
+  apply:
+    scale: 1
+    start_on_create: true
+  solr:
+    scale: 1
+    start_on_create: true
+  tracker:
+    scale: 1
+    start_on_create: true
+  lendfastfakehost:
+    scale: 1
+    start_on_create: true
+  reportingdashboard:
+    scale: 1
+    start_on_create: true

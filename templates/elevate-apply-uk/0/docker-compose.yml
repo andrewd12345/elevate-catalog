@@ -1,0 +1,70 @@
+version: '2'
+services:
+  apply2:
+    image: docker-registry.sandstone.com.au/unisys/sst_apache:demo_lfd_2.9_build_4480_patch_5
+  uasadmin:
+    image: docker-registry.sandstone.com.au/unisys/sst_uasadmin:demo_lfe_3.11.3_build_latest
+    environment:
+      DB_LENDFAST: LENDFAST_ELEVATE_REPLACE_ME
+      DB_LENDFAST_PASSWORD: lendfastseam
+      DB_LENDFAST_USER: elevate
+      JGROUPS_BIND_ADDR: uasadmin
+      LIQUIBASE_SCHEMA: uas-gwt.master.schema.changelog.xml
+    links:
+    - db:db
+    - solr:solr
+  lendfast:
+    image: docker-registry.sandstone.com.au/unisys/sst_lendfast:demo_lfe_3.11.3_build_latest_patch_6
+    environment:
+      DB_LENDFAST: LENDFAST_ELEVATE_REPLACE_ME
+      DB_LENDFAST_PASSWORD: elevate
+      DB_LENDFAST_USER: elevate
+      JGROUPS_BIND_ADDR: lendfast
+      LIQUIBASE_SCHEMA: lfe.demo.master.changelog.xml
+      RMI_SERVER_HOSTNAME: lendfast
+    links:
+    - solr:solr
+    - qas:qas
+    - lendfastfakehost:lendfastfakehost
+    - db:db
+  qas:
+    image: rancher/external-service
+  balancer:
+    image: rancher/lb-service-haproxy:v0.5.9
+    expose:
+    - 80:80/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  apply:
+    image: docker-registry.sandstone.com.au/unisys/sst_sandstoneapply:demo_lfd_2.9_build_unisys_patch_6
+    environment:
+      DB_APPLY: SandstoneApply_ELEVATE_REPLACE_ME
+      DB_APPLY_PASSWORD: elevate
+      DB_APPLY_USER: elevate
+      JGROUPS_BIND_ADDR: apply
+      JGROUPS_INITIAL_HOSTS: '"apply[44807]"'
+      OTHER_RMI_HOSTS: '"apply"'
+      RMI_SERVER_HOSTNAME: apply
+    stdin_open: true
+    volumes:
+    - /sst/elevate_uk/config:/sst/external_conf
+    - /sst/elevate_uk/logs:/sst/logs
+    - /sst/elevate_uk/config/sandstoneapply_conf/jboss_config/standalone.conf:/sst/installed/jboss-eap-6.4/bin/standalone.conf
+    - /sst/elevate_uk/config/sandstoneapply_conf/jboss_config/standalone-ha.xml:/sst/installed/jboss-eap-6.4/standalone/configuration/standalone-ha.xml
+    tty: true
+    links:
+    - solr:solr
+    - db:db
+  csvfakehost:
+    image: docker-registry.sandstone.com.au/unisys/sst_csvfakehost:demo_lfe_3.11.3_build_18
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+  solr:
+    image: docker-registry.sandstone.com.au/unisys/sst_solr:demo_lfe_3.11.3_build_latest_patch_1
+  lendfastfakehost:
+    image: docker-registry.sandstone.com.au/unisys/sst_lendfastfakehost:demo_lfe_3.11.2_build_latest
+  db:
+    image: rancher/external-service

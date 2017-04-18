@@ -1,0 +1,91 @@
+solr:
+  container_name: solr
+  image: registry.devaws.sandstone.com.au/docker/sst_solr:demo_lfe_3.11.3_build_latest
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label_soft: ${schedule_tag}
+lendfast:
+  container_name: lendfast
+  image: registry.devaws.sandstone.com.au/docker/sst_lendfast:demo_lfe_3.11.3_build_latest
+  environment:
+      DB_LENDFAST: ${lendfast_db_name}
+      DB_LENDFAST_PASSWORD: ${lendfast_db_password}
+      DB_LENDFAST_USER: ${lendfast_db_user}
+      JGROUPS_BIND_ADDR: lendfast
+      LIQUIBASE_SCHEMA: lfe.demo.master.changelog.xml
+      OTHER_RMI_HOSTS: '"lendfast|uasadmin"'
+      RMI_SERVER_HOSTNAME: lendfast
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label_soft: ${schedule_tag}
+  extra_hosts:
+    - DefaultDatabaseServer:${lendfast_db_host}
+    - DefaultQASHost:${qas_host}
+  links:
+    - cds:cds
+    - lendfastfakehost:lendfastfakehost
+    - cvsfakehost:cvsfakehost
+    - solr:solr
+cds:
+  container_name: cds
+  image: registry.devaws.sandstone.com.au/docker/sst_cds:demo_lfe_3.11.3_build_latest
+  environment:
+      LIQUIBASE_SCHEMA: cds.demo.master.changelog.xml
+      DB_CDS: ${cds_db_name}
+      DB_CDS_USER: ${cds_db_user}
+      DB_CDS_PASSWORD: ${cds_db_password}
+      DB_LENDFAST: ${lendfast_db_name}
+      DB_LENDFAST_PASSWORD: ${lendfast_db_password}
+      DB_LENDFAST_USER: ${lendfast_db_user}
+  extra_hosts:
+    - DefaultDatabaseServer:${lendfast_db_host}
+    - DefaultQASHost:${qas_host}
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label_soft: ${schedule_tag}
+uasadmin:
+  container_name: uasadmin
+  image: registry.devaws.sandstone.com.au/docker/sst_uasadmin:demo_lfe_3.11.3_build_latest
+  environment:
+      JGROUPS_BIND_ADDR: uasadmin
+      LIQUIBASE_SCHEMA: uas-gwt.master.schema.changelog.xml
+      DB_LENDFAST: ${lendfast_db_name}
+      DB_LENDFAST_PASSWORD: ${lendfast_db_password}
+      DB_LENDFAST_USER: ${lendfast_db_user}
+  links:
+    - solr:solr
+  extra_hosts:
+    - DefaultDatabaseServer:${lendfast_db_host}
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label_soft: ${schedule_tag}
+lendfastfakehost:
+  container_name: lendfastfakehost
+  image: registry.devaws.sandstone.com.au/docker/sst_lendfastfakehost:demo_lfe_3.11.2_build_latest
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label_soft: ${schedule_tag}
+cvsfakehost:
+  container_name: lendfastfakehost
+  image: registry.devaws.sandstone.com.au/docker/sst_csvfakehost:demo_lfe_3.11.2_build_latest
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label_soft: ${schedule_tag}
+reportingdashboard:
+  container_name: reportingdashboard
+  image: registry.devaws.sandstone.com.au/docker/sst_reportingdashboard:demo_lfe_3.11.3_build_latest
+  environment:
+      DB_LENDFAST: ${lendfast_db_name}
+      DB_LENDFAST_PASSWORD: ${lendfast_db_password}
+      DB_LENDFAST_USER: ${lendfast_db_user}
+      JGROUPS_INITIAL_HOSTS: '"lendfast[44807],uasadmin[44807]"'
+      LIQUIBASE_SCHEMA: lfe.reporting-dashboard-service.schema.changelog.xml
+      OTHER_RMI_HOSTS: '"lendfast|uasadmin"'
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label_soft: ${schedule_tag}
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /sst/composes/${stack_name}/logs:/sst/logs  
+  extra_hosts:
+    - DefaultDatabaseServer:${lendfast_db_host}

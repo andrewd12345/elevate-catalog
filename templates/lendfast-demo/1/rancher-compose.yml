@@ -1,0 +1,62 @@
+.catalog:
+  name: "LendFast Demo"
+  version: "v3.11.3"
+  description: "LendFast Origination System"
+  uuid: lendfast-1
+  minimum_rancher_version: v0.51.0
+  questions:
+    - variable: lendfast_db_name
+      description: "LendFast Database Name"
+      label: "Database Name"
+      required: true
+      default: "LFE_PRODUCT_DEMO_DKR_CI"
+      type: "string"
+    - variable: lendfast_db_password
+      description: "LendFast Database Password"
+      label: "Database Password"
+      required: true
+      default: "lendfastseam"
+      type: "password"
+    - variable: lendfast_db_user
+      description: "LF Database Username"
+      label: "Database User"
+      required: true
+      default: "lendfastseam"
+      type: "string" 
+    - variable: cds_db_name
+      description: "CDS Database Name"
+      label: "Database Name"
+      required: true
+      default: "LFE_PRODUCT_DEMO_DKR_CDS_CI"
+      type: "string"
+    - variable: cds_db_password
+      description: "CDS Database Password"
+      label: "Database Password"
+      required: true
+      default: "lendfastseam"
+      type: "password"
+    - variable: cds_db_user
+      description: "CDS Database Username"
+      label: "Database User"
+      required: true
+      default: "lendfastseam"
+      type: "string"
+    - variable: lendfast_db_host
+      description: "LendFast Database Host or IP"
+      label: "Database Host"
+      required: true
+      default: "10.30.1.86"
+      type: "string"
+    - variable: qas_host
+      description: "QAS Host"
+      label: "QAS Host"
+      required: true
+      default: "10.96.14.115"
+      type: "string"
+    - variable: schedule_tag
+      description: "Shedule tag where the stack should be hosted"
+      label: "Schedule Tag"
+      required: true
+      default: "usage=application"
+      type: "string"
+lendfast:
