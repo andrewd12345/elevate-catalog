@@ -1,0 +1,19 @@
+version: '2'
+services:
+  bankfast:
+    image: docker-registry.sandstone.com.au/unisys/bankfast_test:1.6
+    environment:
+      DB_HOST: db
+      DB_NAME: BankFast_ELEVATE_REPLACE_ME
+      DB_PASSWORD: elevate
+      DB_USERNAME: elevate
+      HOST_ENDPOINT: http://localhost:12018
+    stdin_open: true
+    tty: true
+    command:
+    - /bin/sh
+    - -c
+    - /sst/scripts/start.sh
+    labels:
+      io.rancher.container.start_once: 'true'
+ 

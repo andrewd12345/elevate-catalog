@@ -1,0 +1,18 @@
+version: '2'
+catalog:
+  name: "My Demo"
+  version: "v1.1.1"
+  description: "BankFast"
+  uuid: testbf-1
+  minimum_rancher_version: v0.51.0
+  questions:
+    - variable: lendfast_db_name
+      description: "LendFast Database Name"
+      label: "Database Name"
+      required: true
+      default: "LFE_PRODUCT_DEMO_DKR_CI"
+      type: "string"
+services:
+  bankfast:
+    scale: 1
+    start_on_create: true
