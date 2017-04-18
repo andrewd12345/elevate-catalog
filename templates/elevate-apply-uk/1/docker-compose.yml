@@ -5,9 +5,9 @@ services:
   uasadmin:
     image: docker-registry.sandstone.com.au/unisys/sst_uasadmin:demo_lfe_3.11.3_build_latest
     environment:
-      DB_LENDFAST: LENDFAST_ELEVATE_REPLACE_ME
-      DB_LENDFAST_PASSWORD: lendfastseam
-      DB_LENDFAST_USER: elevate
+      DB_LENDFAST: ${lendfast_db_name}
+      DB_LENDFAST_PASSWORD: ${lendfast_db_password}
+      DB_LENDFAST_USER: ${lendfast_db_user}
       JGROUPS_BIND_ADDR: uasadmin
       LIQUIBASE_SCHEMA: uas-gwt.master.schema.changelog.xml
     links:
@@ -16,9 +16,9 @@ services:
   lendfast:
     image: docker-registry.sandstone.com.au/unisys/sst_lendfast:demo_lfe_3.11.3_build_latest_patch_6
     environment:
-      DB_LENDFAST: LENDFAST_ELEVATE_REPLACE_ME
-      DB_LENDFAST_PASSWORD: elevate
-      DB_LENDFAST_USER: elevate
+      DB_LENDFAST: ${lendfast_db_name}
+      DB_LENDFAST_PASSWORD: ${lendfast_db_password}
+      DB_LENDFAST_USER: ${lendfast_db_user}
       JGROUPS_BIND_ADDR: lendfast
       LIQUIBASE_SCHEMA: lfe.demo.master.changelog.xml
       RMI_SERVER_HOSTNAME: lendfast
@@ -39,9 +39,9 @@ services:
   apply:
     image: docker-registry.sandstone.com.au/unisys/sst_sandstoneapply:demo_lfd_2.9_build_unisys_patch_6
     environment:
-      DB_APPLY: SandstoneApply_ELEVATE_REPLACE_ME
-      DB_APPLY_PASSWORD: elevate
-      DB_APPLY_USER: elevate
+      DB_APPLY: ${apply_db_name}
+      DB_APPLY_PASSWORD: ${apply_db_password}
+      DB_APPLY_USER: ${apply_db_user}
       JGROUPS_BIND_ADDR: apply
       JGROUPS_INITIAL_HOSTS: '"apply[44807]"'
       OTHER_RMI_HOSTS: '"apply"'

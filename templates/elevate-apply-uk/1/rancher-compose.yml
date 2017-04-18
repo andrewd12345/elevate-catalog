@@ -1,4 +1,77 @@
 version: '2'
+catalog:
+  name: "Elevate Apply"
+  version: "v0.1"
+  description: "Elevate Apply System"
+  uuid: elevate-apply-1
+  minimum_rancher_version: v0.51.0
+  questions:
+    - variable: lendfast_db_name
+      description: "LendFast Database Name"
+      label: "Database Name"
+      required: true
+      default: "LendFast_ELEVATE"
+      type: "string"
+    - variable: lendfast_db_password
+      description: "LendFast Database Password"
+      label: "Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: lendfast_db_user
+      description: "LendFast Database Username"
+      label: "Database User"
+      required: true
+      default: "elevate"
+      type: "string" 
+    - variable: db_host
+      description: "Database Host IP"
+      label: "Database Host"
+      required: true
+      default: "51.140.xxx.yyy"
+      type: "string"
+    - variable: apply_db_name
+      description: "Apply Database Name"
+      label: "Database Name"
+      required: true
+      default: "SandstoneApply_ELEVATE"
+      type: "string"
+    - variable: apply_db_password
+      description: "Apply Database Password"
+      label: "Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: apply_db_user
+      description: "Apply Database Username"
+      label: "Database User"
+      required: true
+      default: "elevate"
+      type: "string" 
+    - variable: cds_db_name
+      description: "CDS Database Name"
+      label: "Database Name"
+      required: false
+      default: "CDS_ELEVATE"
+      type: "string"
+    - variable: cds_db_password
+      description: "CDS Database Password"
+      label: "Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: cds_db_user
+      description: "CDS Database Username"
+      label: "Database User"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: qas_host
+      description: "QAS Host"
+      label: "QAS Host"
+      required: true
+      default: "51.140.xxx.yyy"
+      type: "string"
 services:
   apply2:
     scale: 1
@@ -11,7 +84,7 @@ services:
     start_on_create: true
   qas:
     external_ips:
-    - 54.252.201.47
+    - ${qas_host}
     start_on_create: true
   balancer:
     scale: 1
@@ -82,5 +155,5 @@ services:
     start_on_create: true
   db:
     external_ips:
-    - 51.140.163.112
+    - ${db_host}
     start_on_create: true
