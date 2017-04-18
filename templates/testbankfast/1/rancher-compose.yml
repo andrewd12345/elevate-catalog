@@ -1,0 +1,143 @@
+version: '2'
+catalog:
+  name: "Elevate BankFast"
+  version: "v0.1"
+  description: "Elevate BankFast System"
+  uuid: elevate-bankfast-1
+  minimum_rancher_version: v0.51.0
+  questions:
+    - variable: bankfast_db_name
+      description: "BankFast Database Name"
+      label: "Database Name"
+      required: true
+      default: "BankFast_ELEVATE"
+      type: "string"
+    - variable: bankfast_db_password
+      description: "BankFast Database Password"
+      label: "Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: bankfast_db_user
+      description: "BankFast Database Username"
+      label: "BankFast Database User"
+      required: true
+      default: "elevate"
+      type: "string" 
+    - variable: db_host
+      description: "Database Host IP"
+      label: "Database Host"
+      required: true
+      default: "51.140.xxx.yyy"
+      type: "string"
+    - variable: host_endpoint
+      description: "URL endpoint for TM host"
+      label: "Host Endpoint"
+      required: true
+      default: "http://localhost:12018"
+      type: "string"
+    - variable: external_site_address
+      description: "Fully qualified external host address for access to the site"
+      label: "External site address"
+      required: true
+      default: "bankfast-apac.elevate-dev.sandstone.com.au"
+      type: "string"
+    - variable: rcas_db_name
+      description: "RCAS Database Name"
+      label: "RCAS Database Name"
+      required: true
+      default: "Rcas_ELEVATE"
+      type: "string"
+    - variable: rcas_db_password
+      description: "Apply Database Password"
+      label: "RCAS Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: rcas_db_user
+      description: "RCAS Database Username"
+      label: "RCAS Database User"
+      required: true
+      default: "elevate"
+      type: "string" 
+    - variable: liferay_db_name
+      description: "Liferay Database Name"
+      label: "Liferay Database Name"
+      required: fasle
+      default: "Liferay_ELEVATE"
+      type: "string"
+    - variable: liferay_db_password
+      description: "Liferay Database Password"
+      label: "Liferay Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: liferay_db_user
+      description: "Liferay Database Username"
+      label: "Liferay Database User"
+      required: true
+      default: "elevate"
+      type: "string"
+services:
+  bankfast:
+    scale: 1
+    start_on_create: true
+  apache:
+    scale: 1
+    start_on_create: true
+  balancer:
+    scale: 1
+    start_on_create: true
+    lb_config:
+      certs: []
+      port_rules:
+      - priority: 1
+        protocol: http
+        service: apache
+        source_port: 80
+        target_port: 80
+      - priority: 2
+        protocol: http
+        service: bfsi
+        source_port: 90
+        target_port: 9080
+      - priority: 3
+        protocol: http
+        service: liferay
+        source_port: 8080
+        target_port: 8080
+      - priority: 5
+        protocol: http
+        service: rcas
+        source_port: 9080
+        target_port: 9080
+      - priority: 6
+        protocol: http
+        service: bankfast
+        source_port: 13588
+        target_port: 13588
+      - priority: 7
+        protocol: http
+        service: bankfast
+        source_port: 13500
+        target_port: 13500
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 42
+      unhealthy_threshold: 3
+      interval: 2000
+      strategy: recreate
+  bfsi:
+    scale: 1
+    start_on_create: true
+  liferay:
+    scale: 1
+    start_on_create: true
+  rcas:
+    scale: 1
+    start_on_create: true
+  db:
+    external_ips:
+    - 51.140.163.112
+    start_on_create: true
