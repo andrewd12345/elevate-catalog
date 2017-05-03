@@ -67,7 +67,7 @@ services:
     - -c
     - /opt/sst/start.sh
   rcas:
-    image: docker-registry.sandstone.com.au/unisys/rcas
+    image: docker-registry.sandstone.com.au/unisys/rcas:1.1
     environment:
       DB_RCAS: ${rcas_db_name}
       DB_RCAS_PASSWORD: ${rcas_db_password}
