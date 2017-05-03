@@ -14,7 +14,7 @@ services:
     - db:db
     - solr:solr
   lendfast:
-    image: docker-registry.sandstone.com.au/unisys/sst_lendfast:demo_lfe_3.11.3_build_latest_patch_6
+    image: docker-registry.sandstone.com.au/unisys/sst_lendfast:demo_lfe_3.11.3_build_latest_patch_7
     environment:
       DB_LENDFAST: ${lendfast_db_name}
       DB_LENDFAST_PASSWORD: ${lendfast_db_password}
