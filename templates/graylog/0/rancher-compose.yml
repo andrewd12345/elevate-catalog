@@ -1,0 +1,17 @@
+version: '2'
+catalog:
+  name: "Elevate Graylog"
+  version: "v0.1"
+  description: "Elevate Graylog Logging System"
+  uuid: elevate-graylog-1
+  minimum_rancher_version: v0.51.0
+services:
+  mongo:
+    scale: 1
+    start_on_create: true
+  elasticsearch:
+    scale: 1
+    start_on_create: true
+  graylog:
+    scale: 1
+    start_on_create: true
