@@ -1,0 +1,81 @@
+version: '2'
+services:
+  bankfast:
+    image: docker-registry.sandstone.com.au/unisys/bankfast:1.11.2
+    environment:
+      DB_HOST: ${db_host}
+      DB_NAME: ${bankfast_db_name}
+      DB_PASSWORD: ${bankfast_db_password}
+      DB_USERNAME: ${bankfast_db_user}
+      HOST_ENDPOINT: http://localhost:12018
+    stdin_open: true
+    tty: true
+    command:
+    - /bin/sh
+    - -c
+    - /sst/scripts/start.sh
+    labels:
+      io.rancher.container.start_once: 'true'
+  apache:
+    image: docker-registry.sandstone.com.au/unisys/bankfast_apache:1.3.1
+    stdin_open: true
+    tty: true
+  balancer:
+    image: rancher/lb-service-haproxy:v0.5.9
+    expose:
+    - 80:80/tcp
+    - 90:90/tcp
+    - 8080:8080/tcp
+    - 9080:9080/tcp
+    - 13588:13588/tcp
+    - 13500:13500/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  bfsi:
+    image: docker-registry.sandstone.com.au/unisys/bfsi:1.2.1
+    command:
+    - /bin/sh
+    - -c
+    - /opt/sst/start.sh
+  liferay:
+    image: docker-registry.sandstone.com.au/unisys/liferay:1.6.1
+    environment:
+      DB_HOST: ${db_host}
+      DB_NAME: ${liferay_db_name}
+      DB_PASSWORD: ${liferay_db_password}
+      DB_USERNAME: ${liferay_db_user}
+      SITE_ADDRESS: ${external_site_address}
+    links:
+    - db:db
+    command:
+    - /bin/sh
+    - -c
+    - /opt/sst/start.sh
+  liferay-admin:
+    image: docker-registry.sandstone.com.au/unisys/liferay:1.6.1
+    environment:
+      DB_HOST: ${db_host}
+      DB_NAME: ${liferay_db_name}
+      DB_PASSWORD: ${liferay_db_password}
+      DB_USERNAME: ${liferay_db_user}
+      SITE_ADDRESS: ${external_site_address}
+    links:
+    - db:db
+    command:
+    - /bin/sh
+    - -c
+    - /opt/sst/start.sh
+  rcas:
+    image: docker-registry.sandstone.com.au/unisys/rcas:1.1.12
+    environment:
+      DB_RCAS: ${rcas_db_name}
+      DB_RCAS_PASSWORD: ${rcas_db_password}
+      DB_RCAS_USERNAME: ${rcas_db_user}
+      DB_URL: jdbc:jtds:sqlserver://${db_host}:1433;databaseName=${rcas_db_name}
+    links:
+    - db:db
+    - bfsi:bfsi
+    - liferay:liferay
+  db:
+    image: rancher/external-service
