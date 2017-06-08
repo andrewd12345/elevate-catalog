@@ -1,7 +1,7 @@
 version: '2'
 catalog:
   name: "Elevate BankFast"
-  version: "v0.6"
+  version: "v0.7"
   description: "Elevate BankFast System"
   uuid: elevate-bankfast-1
   minimum_rancher_version: v0.51.0
