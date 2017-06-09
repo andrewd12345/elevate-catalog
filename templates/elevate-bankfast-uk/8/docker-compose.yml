@@ -77,6 +77,7 @@ services:
       DB_RCAS_USERNAME: ${rcas_db_user}
       DB_USERNAME: ${rcas_db_user}
       DB_URL: jdbc:jtds:sqlserver://${db_host}:1433;databaseName=${rcas_db_name}
+      SITE_ADDRESS: ${external_site_address}
     links:
     - db:db
     - bfsi:bfsi
