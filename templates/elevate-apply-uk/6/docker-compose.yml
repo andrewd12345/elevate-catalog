@@ -23,7 +23,7 @@ services:
       LIQUIBASE_SCHEMA: lfe.demo.master.changelog.xml
       RMI_SERVER_HOSTNAME: lendfast
       HOST_ENDPOINT: ${host_endpoint}
-  links:
+    links:
     - solr:solr
     - qas:qas
     - lendfastfakehost:lendfastfakehost
