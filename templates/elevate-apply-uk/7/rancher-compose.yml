@@ -78,6 +78,24 @@ catalog:
       required: true
       default: "http://51.140.ZZZ.YYY/TxSharedWebService/TXShared.svc"
       type: "string" 
+    - variable: language
+      description: "Default Language - current support is for de, en, es, fr, pt, zh"
+      label: "Default Language"
+      required: true
+      default: "en"
+      type: "string" 
+    - variable: country
+      description: "Country - supported values include AU, AR, BR, CA, CN, DE, ES, FR, TW"
+      label: "Country"
+      required: true
+      default: "AU"
+      type: "string" 
+    - variable: currency
+      description: "Default currency - supported values include AUD, ARS, BRL, CAD, CNY, EUR, GBP, TWD"
+      label: "Country"
+      required: true
+      default: "AUD"
+      type: "string" 
 services:
   apply2:
     scale: 1

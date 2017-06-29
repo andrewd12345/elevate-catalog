@@ -2,6 +2,10 @@ version: '2'
 services:
   apply2:
     image: docker-registry.sandstone.com.au/unisys/sst_apache:demo_lfd_2.10_build_112.16
+    environment:
+      LANG: ${language}
+      COUNTRY: ${country}
+      CURRENCY: ${currency}
   uasadmin:
     image: docker-registry.sandstone.com.au/unisys/sst_uasadmin:demo_lfd_2.10_build_94
     environment:
@@ -23,6 +27,9 @@ services:
       LIQUIBASE_SCHEMA: lfe.demo.master.changelog.xml
       RMI_SERVER_HOSTNAME: lendfast
       HOST_ENDPOINT: ${host_endpoint}
+      LANG: ${language}
+      COUNTRY: ${country}
+      CURRENCY: ${currency}
     links:
     - solr:solr
     - qas:qas
@@ -47,6 +54,9 @@ services:
       JGROUPS_INITIAL_HOSTS: '"apply[44807]"'
       OTHER_RMI_HOSTS: '"apply"'
       RMI_SERVER_HOSTNAME: apply
+      LANG: ${language}
+      COUNTRY: ${country}
+      CURRENCY: ${currency}
     stdin_open: true
     tty: true
     links:
