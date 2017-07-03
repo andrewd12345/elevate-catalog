@@ -1,7 +1,7 @@
 version: '2'
 catalog:
   name: "Elevate Apply"
-  version: "v0.7"
+  version: "v0.8"
   description: "Elevate Apply System"
   uuid: elevate-apply-1
   minimum_rancher_version: v0.51.0
