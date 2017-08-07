@@ -1,0 +1,76 @@
+version: '2'
+services:
+  apply2:
+    image: docker-registry.sandstone.com.au/unisys/sst_apache:demo_lfd_2.10_build_112.43
+    environment:
+      LANG: ${language}
+      COUNTRY: ${country}
+      CURRENCY: ${currency}
+  uasadmin:
+    image: docker-registry.sandstone.com.au/unisys/sst_uasadmin:demo_lfd_2.10_build_94
+    environment:
+      DB_LENDFAST: ${lendfast_db_name}
+      DB_LENDFAST_PASSWORD: ${lendfast_db_password}
+      DB_LENDFAST_USER: ${lendfast_db_user}
+      JGROUPS_BIND_ADDR: uasadmin
+      LIQUIBASE_SCHEMA: uas-gwt.master.schema.changelog.xml
+    links:
+    - db:db
+    - solr:solr
+  lendfast:
+    image: docker-registry.sandstone.com.au/unisys/sst_lendfast:demo_lfd_2.10_build_793.21
+    environment:
+      DB_LENDFAST: ${lendfast_db_name}
+      DB_LENDFAST_PASSWORD: ${lendfast_db_password}
+      DB_LENDFAST_USER: ${lendfast_db_user}
+      JGROUPS_BIND_ADDR: lendfast
+      LIQUIBASE_SCHEMA: lfe.demo.master.changelog.xml
+      RMI_SERVER_HOSTNAME: lendfast
+      HOST_ENDPOINT: ${host_endpoint}
+      LANG: ${language}
+      COUNTRY: ${country}
+      CURRENCY: ${currency}
+    links:
+    - solr:solr
+    - qas:qas
+    - lendfastfakehost:lendfastfakehost
+    - db:db
+  qas:
+    image: rancher/external-service
+  balancer:
+    image: rancher/lb-service-haproxy:v0.5.9
+    expose:
+    - 80:80/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  apply:
+    image: docker-registry.sandstone.com.au/unisys/sst_sandstoneapply:demo_lfd_2.10_build_250.38
+    environment:
+      DB_APPLY: ${apply_db_name}
+      DB_APPLY_PASSWORD: ${apply_db_password}
+      DB_APPLY_USER: ${apply_db_user}
+      JGROUPS_BIND_ADDR: apply
+      JGROUPS_INITIAL_HOSTS: '"apply[44807]"'
+      OTHER_RMI_HOSTS: '"apply"'
+      RMI_SERVER_HOSTNAME: apply
+      LANG: ${language}
+      COUNTRY: ${country}
+      CURRENCY: ${currency}
+    stdin_open: true
+    tty: true
+    links:
+    - solr:solr
+    - db:db
+  csvfakehost:
+    image: docker-registry.sandstone.com.au/unisys/sst_csvfakehost:demo_lfe_3.11.3_build_18_patch1
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+  solr:
+    image: docker-registry.sandstone.com.au/unisys/sst_solr:demo_lfd_2.10_build_1.0.6
+  lendfastfakehost:
+    image: docker-registry.sandstone.com.au/unisys/sst_lendfastfakehost:demo_lfe_3.11.2_build_latest
+  db:
+    image: rancher/external-service
