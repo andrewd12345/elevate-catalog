@@ -1,0 +1,183 @@
+version: '2'
+catalog:
+  name: "Elevate Apply"
+  version: "v0.14"
+  description: "Elevate Apply System"
+  uuid: elevate-apply-1
+  minimum_rancher_version: v0.51.0
+  questions:
+    - variable: lendfast_db_name
+      description: "LendFast Database Name"
+      label: "LendFast Database Name"
+      required: true
+      default: "LendFast_ELEVATE"
+      type: "string"
+    - variable: lendfast_db_password
+      description: "LendFast Database Password"
+      label: "LendFast Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: lendfast_db_user
+      description: "LendFast Database Username"
+      label: "Database User"
+      required: true
+      default: "elevate"
+      type: "string" 
+    - variable: db_host
+      description: "Database Host IP"
+      label: "Database Host"
+      required: true
+      default: "51.140.xxx.yyy"
+      type: "string"
+    - variable: apply_db_name
+      description: "Apply Database Name"
+      label: "Apply Database Name"
+      required: true
+      default: "SandstoneApply_ELEVATE"
+      type: "string"
+    - variable: apply_db_password
+      description: "Apply Database Password"
+      label: "Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: apply_db_user
+      description: "Apply Database Username"
+      label: "Database User"
+      required: true
+      default: "elevate"
+      type: "string" 
+    - variable: cds_db_name
+      description: "CDS Database Name"
+      label: "Database Name"
+      required: false
+      default: "CDS_ELEVATE"
+      type: "string"
+    - variable: cds_db_password
+      description: "CDS Database Password"
+      label: "CDS Database Password"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: cds_db_user
+      description: "CDS Database Username"
+      label: "Database User"
+      required: true
+      default: "elevate"
+      type: "string"
+    - variable: qas_host
+      description: "QAS Host"
+      label: "QAS Host"
+      required: true
+      default: "51.140.xxx.yyy"
+      type: "string"
+    - variable: host_endpoint
+      description: "TM Host Endpoint"
+      label: "Host Endpoint"
+      required: true
+      default: "http://51.140.ZZZ.YYY/TxSharedWebService/TXShared.svc"
+      type: "string" 
+    - variable: language
+      description: "Default Language - current support is for de, en, es, fr, pt, zh"
+      label: "Default Language"
+      required: true
+      default: "en"
+      type: "string" 
+    - variable: country
+      description: "Country - supported values include AU, AR, BR, CA, CN, DE, ES, FR, TW"
+      label: "Country"
+      required: true
+      default: "AU"
+      type: "string" 
+    - variable: currency
+      description: "Default currency - supported values include AUD, ARS, BRL, CAD, CNY, EUR, GBP, TWD"
+      label: "Currency"
+      required: true
+      default: "AUD"
+      type: "string" 
+services:
+  apply2:
+    scale: 1
+    start_on_create: true
+  uasadmin:
+    scale: 1
+    start_on_create: true
+  lendfast:
+    scale: 1
+    start_on_create: true
+  qas:
+    external_ips:
+    - ${qas_host}
+    start_on_create: true
+  balancer:
+    scale: 1
+    start_on_create: true
+    lb_config:
+      certs: []
+      port_rules:
+      - path: /apply2
+        priority: 1
+        protocol: http
+        service: apply2
+        source_port: 80
+        target_port: 8080
+      - path: /apply
+        priority: 2
+        protocol: http
+        service: apply
+        source_port: 80
+        target_port: 8080
+      - path: /sandstone-apply-server
+        priority: 3
+        protocol: http
+        service: apply
+        source_port: 80
+        target_port: 8080
+      - path: /solr
+        priority: 4
+        protocol: http
+        service: solr
+        source_port: 80
+        target_port: 8080
+      - path: /elevate
+        priority: 5
+        protocol: http
+        service: apply2
+        source_port: 80
+        target_port: 8080
+      - path: /lendfast
+        priority: 6
+        protocol: http
+        service: lendfast
+        source_port: 80
+        target_port: 8080
+      - path: /creditdecisionservicewar
+        priority: 7
+        protocol: http
+        service: lendfast
+        source_port: 80
+        target_port: 8080
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 42
+      unhealthy_threshold: 3
+      interval: 2000
+      strategy: recreate
+  apply:
+    scale: 1
+    start_on_create: true
+  csvfakehost:
+    scale: 1
+    start_on_create: true
+  solr:
+    scale: 1
+    start_on_create: true
+  lendfastfakehost:
+    scale: 1
+    start_on_create: true
+  db:
+    external_ips:
+    - ${db_host}
+    start_on_create: true
